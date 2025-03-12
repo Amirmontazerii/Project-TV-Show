@@ -9,8 +9,12 @@
   </head>
 
   <body>
-    <div id="root">
-    </div>
+    <header>
+      <h1>Games of Thrones episodes</h1>
+      <input type="text" id="searchBar" placeholder="Search episodes..." />
+      <p id="episodeCount"></p>
+    </header>
+    <div id="root"></div>
 
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
     <script src="episodes.js"></script>
@@ -18,4 +22,11 @@
     <!-- Loads YOUR javascript code -->
     <script src="script.js"></script>
   </body>
+
+  <footer>
+    <p>
+      Data sourced from
+      <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>
+    </p>
+  </footer>
 </html>
