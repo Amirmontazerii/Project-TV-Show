@@ -1,32 +1,49 @@
 const showsApiUrl = "https://api.tvmaze.com/shows";
-let allShows = []; 
-let allEpisodes = {}; 
+let showCache = {}; // Store show details
+let episodeCache = {}; // Store episode lists
 
-// Fetch and populate show selector
+// DOM Elements
+const rootElem = document.getElementById("root");
+const showSelector = document.getElementById("showSelector");
+const episodeSelector = document.getElementById("episodeSelector");
+const searchBar = document.getElementById("searchBar");
+
+// Fetch and display all shows
 async function fetchShows() {
-  const showSelector = document.getElementById("showSelector");
   try {
     const response = await fetch(showsApiUrl);
     if (!response.ok) throw new Error("Failed to fetch shows");
     
-    allShows = await response.json();
-    allShows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    const shows = await response.json();
+    shows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
     
-    showSelector.innerHTML = allShows.map(show => `<option value="${show.id}">${show.name}</option>`).join("");
-    
-    fetchEpisodes(allShows[0].id); // Load first show's episodes by default
+    shows.forEach(show => showCache[show.id] = show);
+    displayShowsListing(shows);
   } catch (error) {
     console.error("Error fetching shows:", error);
+    rootElem.innerHTML = `<p style="color: red;">Failed to load shows.</p>`;
   }
 }
 
-// Fetch episodes for selected show
-async function fetchEpisodes(showId) {
-  const rootElem = document.getElementById("root");
+// Display all shows
+function displayShowsListing(shows) {
+  rootElem.innerHTML = shows.map(show => `
+    <div class="show-card" onclick="fetchAndDisplayShowEpisodes(${show.id})">
+      <h2>${show.name}</h2>
+      <img src="${show.image ? show.image.medium : 'https://via.placeholder.com/210'}" alt="${show.name}">
+      <p><strong>Genres:</strong> ${show.genres.join(", ")}</p>
+      <p><strong>Status:</strong> ${show.status} | <strong>Rating:</strong> ${show.rating.average || 'N/A'} | <strong>Runtime:</strong> ${show.runtime || 'Unknown'} min</p>
+      <p>${show.summary}</p>
+    </div>
+  `).join("");
+}
+
+// Fetch and display episodes for a selected show
+async function fetchAndDisplayShowEpisodes(showId) {
   rootElem.innerHTML = "<p>Loading episodes...</p>";
-  
-  if (allEpisodes[showId]) {
-    makePageForEpisodes(allEpisodes[showId]);
+
+  if (episodeCache[showId]) {
+    displayEpisodes(episodeCache[showId]);
     return;
   }
 
@@ -34,31 +51,26 @@ async function fetchEpisodes(showId) {
     const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
     if (!response.ok) throw new Error("Failed to fetch episodes");
     
-    allEpisodes[showId] = await response.json();
-    makePageForEpisodes(allEpisodes[showId]);
-    createEpisodeSelector(allEpisodes[showId]);
+    episodeCache[showId] = await response.json();
+    displayEpisodes(episodeCache[showId]);
   } catch (error) {
     rootElem.innerHTML = `<p style="color: red;">Failed to load episodes.</p>`;
     console.error("Error fetching episodes:", error);
   }
 }
 
-// Populate episode dropdown and display episodes
-function createEpisodeSelector(episodes) {
-  const selector = document.getElementById("episodeSelector");
-  selector.innerHTML = `<option value="all">Show All Episodes</option>` + 
-    episodes.map(episode => `<option value="${episode.id}">${formatEpisodeTitle(episode)}</option>`).join("");
-}
-
-function makePageForEpisodes(episodes) {
-  const rootElem = document.getElementById("root");
-  rootElem.innerHTML = episodes.map(episode => `
-    <div class="episode-card">
-      <h3>${formatEpisodeTitle(episode)}</h3>
-      <img src="${episode.image ? episode.image.medium : 'https://via.placeholder.com/210'}" alt="${episode.name}">
-      <p>${episode.summary || "No description available."}</p>
-    </div>
-  `).join("");
+// Display episodes
+function displayEpisodes(episodes) {
+  rootElem.innerHTML = `
+    <button onclick="fetchShows()">Back to Shows</button>
+    ${episodes.map(episode => `
+      <div class="episode-card">
+        <h3>${formatEpisodeTitle(episode)}</h3>
+        <img src="${episode.image ? episode.image.medium : 'https://via.placeholder.com/210'}" alt="${episode.name}">
+        <p>${episode.summary || "No description available."}</p>
+      </div>
+    `).join("")}
+  `;
 }
 
 // Format episode title
@@ -66,30 +78,15 @@ function formatEpisodeTitle(episode) {
   return `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")} - ${episode.name}`;
 }
 
-// Handle search functionality
-document.getElementById("searchBar").addEventListener("input", function () {
+// Search functionality for shows
+searchBar.addEventListener("input", function () {
   const query = this.value.toLowerCase();
-  const selectedShowId = document.getElementById("showSelector").value;
-  const filteredEpisodes = allEpisodes[selectedShowId].filter(
-    (episode) => episode.name.toLowerCase().includes(query) || (episode.summary && episode.summary.toLowerCase().includes(query))
+  const filteredShows = Object.values(showCache).filter(show =>
+    show.name.toLowerCase().includes(query) ||
+    show.genres.some(genre => genre.toLowerCase().includes(query)) ||
+    (show.summary && show.summary.toLowerCase().includes(query))
   );
-  makePageForEpisodes(filteredEpisodes);
-});
-
-// Handle episode selection
-document.getElementById("episodeSelector").addEventListener("change", function () {
-  const selectedId = this.value;
-  const selectedShowId = document.getElementById("showSelector").value;
-  if (selectedId === "all") {
-    makePageForEpisodes(allEpisodes[selectedShowId]);
-  } else {
-    makePageForEpisodes([allEpisodes[selectedShowId].find(ep => ep.id == selectedId)]);
-  }
-});
-
-// Handle show selection
-document.getElementById("showSelector").addEventListener("change", function () {
-  fetchEpisodes(this.value);
+  displayShowsListing(filteredShows);
 });
 
 // Initialize application
