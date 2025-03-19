@@ -12,6 +12,16 @@ header {
   padding: 15px;
 }
 
+#showSelector {
+  width: 50%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+
+}
+
 #searchBar {
   width: 50%;
   padding: 10px;
