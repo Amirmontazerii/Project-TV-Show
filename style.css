@@ -1,43 +1,41 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #f9f9f9;
   margin: 0;
   padding: 0;
   text-align: center;
 }
 
 header {
-  background-color: #333;
+  background-color: #1e1e1e;
   color: white;
-  padding: 15px;
+  padding: 20px 10px;
 }
 
-#showSelector {
-  width: 50%;
-  padding: 10px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-
+label {
+  position: absolute;
+  left: -9999px;
 }
 
-#searchBar {
-  width: 50%;
-  padding: 10px;
-  margin: 10px 0;
+header select,
+header input,
+#backToShows {
+  width: 45%;
+  padding: 12px;
+  margin: 10px 5px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   font-size: 16px;
 }
 
-#episodeSelector{
-  width: 50%;
-  padding: 10px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
+#backToShows {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+#backToShows:hover {
+  background-color: #0056b3;
 }
 
 #root {
@@ -47,36 +45,69 @@ header {
   padding: 20px;
 }
 
+.show-card,
 .episode-card {
   background: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 15px;
-  padding: 15px;
+  padding: 20px;
   width: 300px;
   text-align: left;
+  transition: transform 0.3s ease;
 }
 
+.show-card:hover,
+.episode-card:hover {
+  transform: scale(1.03);
+}
+
+.show-card img,
 .episode-card img {
   width: 100%;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
-.episode-card h2 {
-  font-size: 18px;
+.show-card h3,
+.episode-card h3 {
+  font-size: 20px;
   margin: 10px 0;
+  color: #333;
 }
 
+.show-card p,
 .episode-card p {
   font-size: 14px;
   color: #555;
 }
 
 footer {
-  background-color: #333;
+  background-color: #1e1e1e;
   color: white;
-  padding: 10px;
+  padding: 15px;
   position: fixed;
   width: 100%;
   bottom: 0;
+}
+footer a {
+  color: #00ffff;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+footer a:hover {
+  color: #00b3b3;
+}
+
+@media (max-width: 600px) {
+  header select,
+  header input,
+  #backToShows {
+    width: 90%;
+  }
+
+  .show-card,
+  .episode-card {
+    width: 90%;
+  }
 }
