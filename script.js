@@ -4,73 +4,27 @@ let episodeCache = {}; // Store episode lists
 
 // DOM Elements
 const rootElem = document.getElementById("root");
+const searchBar = document.getElementById("searchBar");
 const backToShowsBtn = document.getElementById("backToShows");
 const showSelector = document.getElementById("showSelector");
-const episodeSearchBar = document.getElementById("episodeSearchBar");
-const episodeSelector = document.getElementById("episodeSelector");
 
 // Fetch and display all shows
 async function fetchShows() {
+  backToShowsBtn.style.display = "none"; // Hide back button when showing shows
   try {
     const response = await fetch(showsApiUrl);
     if (!response.ok) throw new Error("Failed to fetch shows");
-    
+
     const shows = await response.json();
     shows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
-    
+
     shows.forEach(show => showCache[show.id] = show);
-    populateShowSelector(shows);
     displayShowsListing(shows);
-    backToShowsBtn.style.display = "none";
+    populateShowDropdown(shows);
   } catch (error) {
     console.error("Error fetching shows:", error);
     rootElem.innerHTML = `<p style="color: red;">Failed to load shows.</p>`;
   }
-}
-
-// Populate the Show Selector dropdown
-function populateShowSelector(shows) {
-  showSelector.innerHTML = `<option value="">Select a Show</option>`;
-  shows.forEach(show => {
-    const option = document.createElement("option");
-    option.value = show.id;
-    option.textContent = show.name;
-    showSelector.appendChild(option);
-  });
-}
-
-// Fetch and display episodes for a selected show
-async function fetchAndDisplayShowEpisodes(showId) {
-  rootElem.innerHTML = "<p>Loading episodes...</p>";
-  backToShowsBtn.style.display = "block";
-
-  if (episodeCache[showId]) {
-    displayEpisodes(episodeCache[showId]);
-    return;
-  }
-
-  try {
-    const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
-    if (!response.ok) throw new Error("Failed to fetch episodes");
-    
-    episodeCache[showId] = await response.json();
-    populateEpisodeSelector(episodeCache[showId]);
-    displayEpisodes(episodeCache[showId]);
-  } catch (error) {
-    rootElem.innerHTML = `<p style="color: red;">Failed to load episodes.</p>`;
-    console.error("Error fetching episodes:", error);
-  }
-}
-
-// Populate the Episode Selector dropdown
-function populateEpisodeSelector(episodes) {
-  episodeSelector.innerHTML = `<option value="all">Show All Episodes</option>`;
-  episodes.forEach(episode => {
-    const option = document.createElement("option");
-    option.value = episode.id;
-    option.textContent = formatEpisodeTitle(episode);
-    episodeSelector.appendChild(option);
-  });
 }
 
 // Display all shows
@@ -84,6 +38,28 @@ function displayShowsListing(shows) {
       <p>${show.summary}</p>
     </div>
   `).join("");
+}
+
+// Fetch and display episodes for a selected show
+async function fetchAndDisplayShowEpisodes(showId) {
+  rootElem.innerHTML = "<p>Loading episodes...</p>";
+  backToShowsBtn.style.display = "inline"; // Show back button
+
+  if (episodeCache[showId]) {
+    displayEpisodes(episodeCache[showId]);
+    return;
+  }
+
+  try {
+    const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
+    if (!response.ok) throw new Error("Failed to fetch episodes");
+
+    episodeCache[showId] = await response.json();
+    displayEpisodes(episodeCache[showId]);
+  } catch (error) {
+    rootElem.innerHTML = `<p style="color: red;">Failed to load episodes.</p>`;
+    console.error("Error fetching episodes:", error);
+  }
 }
 
 // Display episodes
@@ -102,30 +78,48 @@ function formatEpisodeTitle(episode) {
   return `S${String(episode.season).padStart(2, "0")}E${String(episode.number).padStart(2, "0")} - ${episode.name}`;
 }
 
-// Filter episodes by search query
-episodeSearchBar.addEventListener("input", function () {
+// Search functionality for shows
+searchBar.addEventListener("input", function () {
   const query = this.value.toLowerCase();
-  const selectedShowId = showSelector.value;
-  
-  const filteredEpisodes = episodeCache[selectedShowId].filter(episode =>
-    episode.name.toLowerCase().includes(query) ||
-    (episode.summary && episode.summary.toLowerCase().includes(query))
+  const filteredShows = Object.values(showCache).filter(show =>
+    show.name.toLowerCase().includes(query) ||
+    show.genres.some(genre => genre.toLowerCase().includes(query)) ||
+    (show.summary && show.summary.toLowerCase().includes(query))
   );
-  displayEpisodes(filteredEpisodes);
+  displayShowsListing(filteredShows);
+  populateShowDropdown(filteredShows); // Update dropdown with filtered list
 });
 
-// Show selected episodes
-episodeSelector.addEventListener("change", function () {
-  const selectedShowId = showSelector.value;
-  const selectedEpisodeId = this.value;
+// Populate dropdown with show list
+function populateShowDropdown(shows) {
+  showSelector.innerHTML = '<option value="">Select a show...</option>'; // Reset options
 
-  if (selectedEpisodeId === "all") {
-    displayEpisodes(episodeCache[selectedShowId]);
-  } else {
-    const selectedEpisode = episodeCache[selectedShowId].find(episode => episode.id == selectedEpisodeId);
-    displayEpisodes([selectedEpisode]);
+  shows.forEach(show => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelector.appendChild(option);
+  });
+}
+
+// Handle dropdown selection
+showSelector.addEventListener("change", function () {
+  const selectedId = this.value;
+  if (selectedId) {
+    fetchAndDisplayShowEpisodes(selectedId);
   }
+});
+
+// Handle back button click
+backToShowsBtn.addEventListener("click", () => {
+  fetchShows(); // Go back to shows listing
+  backToShowsBtn.style.display = "none"; // Hide the button again
+  searchBar.value = ""; // Clear search input
+  showSelector.value = ""; // Reset dropdown
 });
 
 // Initialize application
 window.onload = fetchShows;
+
+// Expose fetchAndDisplayShowEpisodes to global scope for onclick
+window.fetchAndDisplayShowEpisodes = fetchAndDisplayShowEpisodes;
