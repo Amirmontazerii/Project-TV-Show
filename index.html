@@ -11,13 +11,23 @@
   <body>
     <header>
       <h1>TV Show Explorer</h1>
-      <button id="backToShows" style="display: none;" onclick="fetchShows()">Back to Shows</button>
-      
-      <!-- Show Selector and Episode Search -->
+      <button id="backToShows" style="display: none" onclick="fetchShows()">
+        Back to Shows
+      </button>
+
+      <label for="showSelector">Select a Show:</label>
       <select id="showSelector">
         <option value="">Select a Show</option>
       </select>
-      <input type="text" id="episodeSearchBar" placeholder="Search episodes..." />
+
+      <label for="episodeSearchBar">Search Episodes:</label>
+      <input
+        type="text"
+        id="episodeSearchBar"
+        placeholder="Search episodes..."
+      />
+
+      <label for="episodeSelector">Choose an Episode:</label>
       <select id="episodeSelector">
         <option value="all">Show All Episodes</option>
       </select>
