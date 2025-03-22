@@ -4,9 +4,8 @@ let episodeCache = {}; // Store episode lists
 
 // DOM Elements
 const rootElem = document.getElementById("root");
-const showSelector = document.getElementById("showSelector");
-const episodeSelector = document.getElementById("episodeSelector");
 const searchBar = document.getElementById("searchBar");
+const backToShowsBtn = document.getElementById("backToShows");
 
 // Fetch and display all shows
 async function fetchShows() {
@@ -19,6 +18,7 @@ async function fetchShows() {
     
     shows.forEach(show => showCache[show.id] = show);
     displayShowsListing(shows);
+    backToShowsBtn.style.display = "none";
   } catch (error) {
     console.error("Error fetching shows:", error);
     rootElem.innerHTML = `<p style="color: red;">Failed to load shows.</p>`;
@@ -41,6 +41,7 @@ function displayShowsListing(shows) {
 // Fetch and display episodes for a selected show
 async function fetchAndDisplayShowEpisodes(showId) {
   rootElem.innerHTML = "<p>Loading episodes...</p>";
+  backToShowsBtn.style.display = "block";
 
   if (episodeCache[showId]) {
     displayEpisodes(episodeCache[showId]);
@@ -61,16 +62,13 @@ async function fetchAndDisplayShowEpisodes(showId) {
 
 // Display episodes
 function displayEpisodes(episodes) {
-  rootElem.innerHTML = `
-    <button onclick="fetchShows()">Back to Shows</button>
-    ${episodes.map(episode => `
-      <div class="episode-card">
-        <h3>${formatEpisodeTitle(episode)}</h3>
-        <img src="${episode.image ? episode.image.medium : 'https://via.placeholder.com/210'}" alt="${episode.name}">
-        <p>${episode.summary || "No description available."}</p>
-      </div>
-    `).join("")}
-  `;
+  rootElem.innerHTML = episodes.map(episode => `
+    <div class="episode-card">
+      <h3>${formatEpisodeTitle(episode)}</h3>
+      <img src="${episode.image ? episode.image.medium : 'https://via.placeholder.com/210'}" alt="${episode.name}">
+      <p>${episode.summary || "No description available."}</p>
+    </div>
+  `).join("");
 }
 
 // Format episode title
@@ -90,4 +88,4 @@ searchBar.addEventListener("input", function () {
 });
 
 // Initialize application
-window.onload = fetchShows;
+window.onload = fetchShows; 
