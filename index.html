@@ -11,37 +11,23 @@
   <body>
     <header>
       <h1>TV Show Explorer</h1>
-      <button id="backToShows" style="display: none" onclick="fetchShows()">
-        Back to Shows
-      </button>
-
-      <label for="showSelector">Select a Show:</label>
+      <input type="text" id="searchBar" placeholder="Search shows..." />
       <select id="showSelector">
-        <option value="">Select a Show</option>
+        <option value="">Select a show...</option>
       </select>
-
-      <label for="episodeSearchBar">Search Episodes:</label>
-      <input
-        type="text"
-        id="episodeSearchBar"
-        placeholder="Search episodes..."
-      />
-
-      <label for="episodeSelector">Choose an Episode:</label>
-      <select id="episodeSelector">
-        <option value="all">Show All Episodes</option>
-      </select>
+      <button id="backToShows" style="display: none;">Back to Shows</button>
     </header>
 
     <div id="root"></div>
 
+    <!-- Loads YOUR javascript code -->
     <script src="script.js"></script>
-  </body>
 
-  <footer>
-    <p>
-      Data sourced from
-      <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>
-    </p>
-  </footer>
+    <footer>
+      <p>
+        Data sourced from
+        <a href="https://www.tvmaze.com/" target="_blank">TVMaze.com</a>
+      </p>
+    </footer>
+  </body>
 </html>
