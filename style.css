@@ -51,6 +51,16 @@ label {
   font-size: 18px;
   outline: none;
 }
+#showSelector {
+  width: 70%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 18px;
+  outline: none;
+}
+
 
 #episodeSearchBar {
   width: 70%;
@@ -61,6 +71,30 @@ label {
   font-size: 18px;
   outline: none;
 }
+
+#backToShows {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#backToShows:hover {
+  background-color: #0097a7;
+  transform: translateY(-2px);
+}
+
+#backToShows:active {
+  transform: translateY(0);
+  background-color: #007b8c;
+}
+
 
 /* Show Card Styles */
 #root {
@@ -127,6 +161,56 @@ footer a:hover {
   text-decoration: underline;
   color: #007b8c;
 }
+#searchBar,
+#showSelector {
+  width: 70%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 18px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.episode-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  padding: 15px;
+  width: 200px;
+  text-align: left;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.episode-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.episode-card h3 {
+  font-size: 1.1em;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.episode-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.episode-card p {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.4;
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
